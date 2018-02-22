@@ -14,7 +14,7 @@ yarn add react-as-hoc
 
 This function curries a few functions to properly translate all the data in the correct ways. The API is effectively:
 
-```
+```js
 type RenderPropFunction = ({children: Function}) => Function;
 type PropFn = (props: Object) => Object;
 type TransformMethod = (...renderArgs:any) => Object;
