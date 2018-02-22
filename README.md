@@ -10,6 +10,53 @@
 yarn add react-as-hoc
 ```
 
+## API
+
+This function curries a few functions to properly translate all the data in the correct ways. The API is effectively:
+
+```
+type RenderPropFunction = ({children: Function}) => Function;
+type PropFn = (props: Object) => Object;
+type TransformMethod = (...renderArgs:any) => Object;
+
+type AsHoc = (RenderPropsFunction, ?PropFn) => TransformMethod => React$Component;
+```
+
+Explanation:
+
+```js
+const wrappedButNeedsTransform = asHoc(
+  // This is the render prop component you are wanting to change into an HOC
+  renderPropFn,
+
+  // If this render prop component takes an props itself, you can optionally create the object of props
+  // it will receive. The function takes in the props of the finally wrapped component so you can dynamically
+  // pass props into the render prop component.
+  props => ({foo: props.foo, bar: 2})
+);
+
+/*
+ * Since render prop functions give you named arguments, there isnt a great way for us to know what the key name for the prop should be.
+ * This `TransformMethod` lets you assign proper keys. It does require you to know what the render prop will return. But That is a requirement
+ * for using any render prop component.
+ * For this example, let's assume our render prop component internally looks like this:
+ *
+ * ```js
+ * const GetCoordinates = ({children}) => children(1, 2);
+ * ```
+ *
+ * Our GetCoordinates would often be used like `<GetCoordinates>{(x, y) => ...}</GetCoordinates>`
+ *
+ * Here we just trasform the names args into an object to spread into our component
+ */
+const hoc = wrappedButNeedsTransform((x, y) => ({x, y}));
+
+/*
+ * Now we have our HOC and can wrap our component with it. Which will then get x and y as props.
+ */
+const Component = hoc(({x, y}) => <div>{x} {y}</div>);
+```
+
 ## Usage
 
 This example is based on [react-motion](https://github.com/chenglou/react-motion)'s render Prop API.
